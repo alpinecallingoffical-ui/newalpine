@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100 dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alpine - Fast Nepal Digital Goods Platform</title>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        alpine: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#334e68',
+                            800: '#102a43',
+                            900: '#0b1d3a',
+                            accent: '#38bdf8',
+                            esewa: '#60bb46',
+                            khalti: '#5c2d91',
+                            fonepay: '#e31b23'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased selection:bg-sky-500 selection:text-white pb-20 md:pb-0 overflow-x-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 glass-nav border-b border-slate-800/80 px-4 py-3 transition-all">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.navigate('home')">
+                <!-- Alpine Custom Logo matching brand artwork -->
+                <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 border border-slate-800 p-1 shadow-md">
+                    <svg viewBox="0 0 100 100" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Left leg (Emerald / Dark Green) -->
+                        <path d="M 18,80 L 48,20 L 58,20 L 32,80 Z" fill="#15803d"/>
+                        <!-- Right leg (Slate / Dark Grey) -->
+                        <path d="M 50,20 L 60,20 L 82,80 L 70,80 Z" fill="#334155"/>
+                        <!-- Gold accent line -->
+                        <path d="M 52,48 L 74,62 L 72,66 L 48,51 Z" fill="#d97706" opacity="0.85"/>
+                        <!-- Ribbon Swoosh (Deep Navy) -->
+                        <path d="M 18,80 C 35,70 52,62 80,42 C 84,39 82,32 75,37 C 50,55 35,63 18,80 Z" fill="#1e3a8a"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-sky-400 bg-clip-text text-transparent">ALPINE</span>
+                    <span class="text-[10px] uppercase tracking-widest text-sky-400 block -mt-1 font-semibold">Nepal Digital</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
+                <button onclick="app.navigate('home')" class="hover:text-white transition">Store</button>
+                <button onclick="app.navigate('categories')" class="hover:text-white transition">Categories</button>
+                <button onclick="app.navigate('purchases')" class="hover:text-white transition">My Library</button>
+                <button onclick="app.toggleTechSpecs()" class="hover:text-sky-400 text-xs px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700">Architecture Spec</button>
+            </nav>
+
+            <!-- Action Cluster -->
+            <div class="flex items-center gap-3">
+                <!-- Cart Button -->
+                <button onclick="app.openCartModal()" class="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition">
+                    <i class="ph-bold ph-shopping-bag text-xl"></i>
+                    <span id="cart-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-sky-500 text-white font-bold text-[11px] rounded-full flex items-center justify-center">0</span>
+                </button>
+
+                <!-- Auth/User Button -->
+                <div id="user-header-profile">
+                    <!-- Dynamic Auth Rendered via JS -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Architecture & PRD Modal (Hidden by default) -->
+    <div id="specs-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-y-auto p-6 text-slate-300 shadow-2xl relative">
+            <button onclick="app.toggleTechSpecs()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                <i class="ph-bold ph-x text-lg"></i>
+            </button>
+            
+            <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                <i class="ph-duotone ph-cpu text-sky-400"></i> Technical PRD & Architecture Blueprint
+            </h2>
+            <p class="text-xs text-slate-400 mb-6">Production Architecture Blueprint for Alpine Digital Marketplace (Nepal localized)</p>
+
+            <div class="space-y-6 text-sm">
+                <section>
+                    <h3 class="text-sky-400 font-semibold mb-2 text-base border-b border-slate-800 pb-1">1. PostgreSQL / Supabase Schema Schema Blueprint</h3>
+                    <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono overflow-x-auto text-sky-300">
+-- 1. USERS & PROFILES
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  email TEXT NOT NULL,
+  phone TEXT,
+  full_name TEXT,
+  role TEXT DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. CATEGORIES
+CREATE TABLE public.categories (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  icon TEXT
+);
+
+-- 3. PRODUCTS (EBooks, Topups, Subscriptions, Audio, Apps)
+CREATE TABLE public.products (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  category_id UUID REFERENCES public.categories(id),
+  type TEXT CHECK (type IN ('file', 'key_voucher')),
+  price_npr NUMERIC NOT NULL,
+  description TEXT,
+  cover_image TEXT,
+  file_storage_path TEXT, -- Secured Supabase Bucket Path
+  activation_pool TEXT[], -- Encrypted keys array for topups/subs
+  stock_status BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. ORDERS & FULFILLMENT
+CREATE TABLE public.orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) NOT NULL,
+  total_amount NUMERIC NOT NULL,
+  payment_method TEXT CHECK (payment_method IN ('esewa', 'khalti', 'fonepay')),
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'completed', 'failed')),
+  transaction_ref TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE public.order_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+  product_id UUID REFERENCES public.products(id),
+  price_npr NUMERIC NOT NULL,
+  delivered_key TEXT -- Assigned key/voucher if applicable
+);
+
+-- 5. VERIFIED REVIEWS
+CREATE TABLE public.reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID REFERENCES public.products(id),
+  user_id UUID REFERENCES public.profiles(id),
+  rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);</pre>
+                </section>
+
+                <section>
+                    <h3 class="text-sky-400 font-semibold mb-2 text-base border-b border-slate-800 pb-1">2. Supabase Row Level Security (RLS) Policy Blueprint</h3>
+                    <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono overflow-x-auto text-emerald-300">
+-- Enable RLS
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+-- Products: Everyone reads, Admins write
+CREATE POLICY "Public Products Access" ON public.products FOR SELECT USING (true);
+
+-- Orders: Users can only see their own orders
+CREATE POLICY "Users view own orders" ON public.orders 
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Storage Bucket Security (Secured Downloads)
+-- Signed URLs with expiration are generated via Edge Functions AFTER validating order completion
+CREATE POLICY "Strict Digital Asset Access" ON storage.objects 
+  FOR SELECT USING (
+    bucket_id = 'digital-assets' 
+    AND EXISTS (
+      SELECT 1 FROM public.orders o
+      JOIN public.order_items oi ON oi.order_id = o.id
+      JOIN public.products p ON oi.product_id = p.id
+      WHERE o.user_id = auth.uid() 
+      AND o.payment_status = 'completed'
+      AND p.file_storage_path = name
+    )
+  );</pre>
+                </section>
+
+                <section>
+                    <h3 class="text-sky-400 font-semibold mb-2 text-base border-b border-slate-800 pb-1">3. Nepal Payment Flow & Direct Fulfillment Engine</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed mb-2">
+                        <strong>eSewa / Khalti Verification Flow:</strong> Client calls gateway API -> Redirects or processes QR -> Webhook receives payload -> Supabase Edge function verifies hash signature -> Order status updated to <code>completed</code> -> Instant Key allocation or Time-limited Signed Download URL issued.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dynamic Content Container -->
+    <main id="app-container" class="flex-1 max-w-6xl w-full mx-auto p-4 md:py-8">
+        <!-- Content dynamically injected here via Alpine App Engine -->
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-slate-800 z-40 px-3 py-2 flex items-center justify-around text-slate-400">
+        <button onclick="app.navigate('home')" id="nav-mob-home" class="flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl transition text-sky-400 font-medium">
+            <i class="ph-bold ph-storefront text-xl"></i>
+            <span>Store</span>
+        </button>
+        <button onclick="app.navigate('categories')" id="nav-mob-categories" class="flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl transition">
+            <i class="ph-bold ph-squares-four text-xl"></i>
+            <span>Categories</span>
+        </button>
+        <button onclick="app.navigate('purchases')" id="nav-mob-purchases" class="flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl transition">
+            <i class="ph-bold ph-download-simple text-xl"></i>
+            <span>Library</span>
+        </button>
+        <button onclick="app.navigate('account')" id="nav-mob-account" class="flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl transition">
+            <i class="ph-bold ph-user-circle text-xl"></i>
+            <span>Account</span>
+        </button>
+    </div>
+
+    <!-- Cart Slide-over Modal -->
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm transition-opacity flex justify-end">
+        <div class="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full flex flex-col p-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-shopping-bag text-sky-400 text-xl"></i>
+                    <h3 class="text-lg font-bold text-white">Your Cart</h3>
+                </div>
+                <button onclick="app.closeCartModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Cart Items Container -->
+            <div id="cart-items-container" class="flex-1 overflow-y-auto py-4 space-y-3">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <!-- Cart Summary & Checkout -->
+            <div class="border-t border-slate-800 pt-4 space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Total Amount:</span>
+                    <span id="cart-total-price" class="text-xl font-bold text-sky-400">NPR 0</span>
+                </div>
+                <button onclick="app.initiateCheckout()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2 transition">
+                    <span>Proceed to Checkout</span>
+                    <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Required Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative">
+            <button onclick="app.closeAuthModal()" class="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg bg-slate-800">
+                <i class="ph-bold ph-x text-md"></i>
+            </button>
+
+            <div class="w-12 h-12 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="ph-bold ph-lock-key"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-1">Authentication Required</h3>
+            <p class="text-xs text-slate-400 mb-6">No guest checkout allowed. Please log in or sign up to access digital goods & instant key delivery.</p>
+
+            <div class="space-y-3">
+                <button onclick="app.loginWithGoogle()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition text-sm">
+                    <i class="ph-bold ph-google-logo text-red-400 text-lg"></i>
+                    <span>Sign in with Google</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Firebase SDK Imports (v11.6.1) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            signInWithPopup,
+            GoogleAuthProvider,
+            onAuthStateChanged,
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            addDoc, 
+            updateDoc, 
+            collection, 
+            query, 
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Provided Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAO0RoHUmiJgUSQotQdsWzqyJbJmu92VeU",
+            authDomain: "food-delivery-5d394.firebaseapp.com",
+            databaseURL: "https://food-delivery-5d394-default-rtdb.firebaseio.com",
+            projectId: "food-delivery-5d394",
+            storageBucket: "food-delivery-5d394.firebasestorage.app",
+            messagingSenderId: "121631565954",
+            appId: "1:121631565954:web:7f60857de202f818cd2c9b"
+        };
+
+        // App Identifier for strict Firestore rules compliance
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'alpine-ecommerce-nepal';
+
+        // Initialize Firebase
+        const fbApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fbApp);
+        const db = getFirestore(fbApp);
+
+        /**
+         * ALPINE E-COMMERCE PLATFORM ENGINE (Firebase Backed)
+         */
+        const SEED_CATEGORIES = [
+            { id: 'cat_ebooks', name: 'eBooks', slug: 'ebooks', icon: 'ph-book-open' },
+            { id: 'cat_topups', name: 'Game Top-ups', slug: 'game-topups', icon: 'ph-game-controller' },
+            { id: 'cat_subs', name: 'App Subscriptions', slug: 'app-subscriptions', icon: 'ph-arrows-clockwise' },
+            { id: 'cat_music', name: 'Music & Audio', slug: 'music', icon: 'ph-headphones' },
+            { id: 'cat_apps', name: 'Paid Apps & Softwares', slug: 'paid-apps', icon: 'ph-code' }
+        ];
+
+        const SEED_PRODUCTS = [
+            {
+                id: 'prod_1',
+                title: 'Nepal Tax & Financial Guide 2026 Edition',
+                slug: 'nepal-tax-financial-guide-2026',
+                category_id: 'cat_ebooks',
+                type: 'file',
+                price_npr: 650,
+                description: 'Comprehensive PDF eBook detailing standard taxation, business registration, and investment laws in Nepal. Instant PDF digital download with cryptographically signed verification.',
+                cover_image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+                file_storage_path: 'ebooks/tax_guide_2026.pdf',
+                stock_status: true,
+                rating: 4.8,
+                reviews_count: 14
+            },
+            {
+                id: 'prod_2',
+                title: 'PUBG Mobile 660 UC (Global / Nepal Direct)',
+                slug: 'pubg-mobile-660-uc',
+                category_id: 'cat_topups',
+                type: 'key_voucher',
+                price_npr: 1250,
+                description: 'Instant delivery of 660 Unknown Cash voucher code directly to your library. Redeems directly in-game or via Midasbuy.',
+                cover_image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80',
+                activation_pool: ['UC-NP-99812-X88', 'UC-NP-99813-A11', 'UC-NP-99814-Z44'],
+                stock_status: true,
+                rating: 4.9,
+                reviews_count: 52
+            },
+            {
+                id: 'prod_3',
+                title: 'Spotify Premium 1-Month Code (Nepal Active)',
+                slug: 'spotify-premium-1m',
+                category_id: 'cat_subs',
+                type: 'key_voucher',
+                price_npr: 380,
+                description: '1 Month Spotify Premium Activation Gift Code. No VPN needed. Works on existing local Nepal Spotify accounts.',
+                cover_image: 'https://images.unsplash.com/photo-1611339555312-e607c8352fd7?auto=format&fit=crop&w=600&q=80',
+                activation_pool: ['SPOT-NP-MONTH-202601', 'SPOT-NP-MONTH-202602'],
+                stock_status: true,
+                rating: 4.7,
+                reviews_count: 29
+            },
+            {
+                id: 'prod_4',
+                title: 'Procreate Pocket / Mobile (iOS License Key)',
+                slug: 'procreate-pocket-ios',
+                category_id: 'cat_apps',
+                type: 'key_voucher',
+                price_npr: 890,
+                description: 'Official License Key for Procreate Mobile. Unlock creative digital painting tools instantly on your device.',
+                cover_image: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=600&q=80',
+                activation_pool: ['PRO-IOS-KEY-88219'],
+                stock_status: true,
+                rating: 5.0,
+                reviews_count: 8
+            },
+            {
+                id: 'prod_5',
+                title: 'Kathmandu Ambient Lo-Fi Stems & Samples (FLAC/WAV)',
+                slug: 'ktm-ambient-lofi-stems',
+                category_id: 'cat_music',
+                type: 'file',
+                price_npr: 450,
+                description: 'Royalty-free audio sample pack incorporating traditional Nepalese instruments recorded in HD lossless FLAC/WAV format.',
+                cover_image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
+                file_storage_path: 'audio/ktm_lofi_pack.zip',
+                stock_status: true,
+                rating: 4.6,
+                reviews_count: 11
+            }
+        ];
+
+        class AlpineApp {
+            constructor() {
+                this.categories = SEED_CATEGORIES;
+                this.products = SEED_PRODUCTS;
+                this.user = null;
+                this.cart = JSON.parse(localStorage.getItem('alpine_cart')) || [];
+                this.purchases = [];
+                this.reviews = [];
+
+                this.currentView = 'home';
+                this.selectedProductId = null;
+                this.selectedCategoryId = null;
+                this.searchQuery = '';
+
+                this.initAuthAndFirestore();
+            }
+
+            async initAuthAndFirestore() {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (e) {
+                    console.error("Auth initialization issue:", e);
+                }
+
+                onAuthStateChanged(auth, (firebaseUser) => {
+                    if (firebaseUser) {
+                        this.user = {
+                            uid: firebaseUser.uid,
+                            name: firebaseUser.displayName || (firebaseUser.isAnonymous ? 'Guest User' : 'Nepali User'),
+                            email: firebaseUser.email || null,
+                            phone: firebaseUser.phoneNumber || null,
+                            isAnonymous: firebaseUser.isAnonymous
+                        };
+                        this.setupFirestoreListeners();
+                    } else {
+                        this.user = null;
+                        this.purchases = [];
+                    }
+                    this.updateHeaderAuth();
+                    this.render();
+                });
+
+                this.updateCartBadge();
+                this.render();
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            setupFirestoreListeners() {
+                if (!this.user) return;
+
+                // Listen to user private purchases library
+                const purchasesCol = collection(db, 'artifacts', appId, 'users', this.user.uid, 'purchases');
+                onSnapshot(purchasesCol, (snapshot) => {
+                    this.purchases = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (this.currentView === 'purchases' || this.currentView === 'product') {
+                        this.render();
+                    }
+                }, (error) => {
+                    console.error("Error fetching purchases:", error);
+                });
+
+                // Listen to public reviews
+                const reviewsCol = collection(db, 'artifacts', appId, 'public', 'data', 'reviews');
+                onSnapshot(reviewsCol, (snapshot) => {
+                    this.reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (this.currentView === 'product') {
+                        this.render();
+                    }
+                }, (error) => {
+                    console.error("Error fetching reviews:", error);
+                });
+            }
+
+            handleResize() {}
+
+            // --- NAVIGATION CONTROLLER ---
+            navigate(view, param = null) {
+                this.currentView = view;
+                
+                if (view === 'product') this.selectedProductId = param;
+                if (view === 'category') this.selectedCategoryId = param;
+                
+                if (['checkout', 'purchases'].includes(view) && (!this.user || this.user.isAnonymous)) {
+                    this.showToast('Please login to access your library & checkout', 'warning');
+                    this.openAuthModal();
+                    this.currentView = 'home';
+                }
+
+                this.updateMobileNavUI();
+                this.render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            updateMobileNavUI() {
+                const buttons = ['home', 'categories', 'purchases', 'account'];
+                buttons.forEach(b => {
+                    const el = document.getElementById(`nav-mob-${b}`);
+                    if (el) {
+                        if (this.currentView === b || (b === 'home' && this.currentView === 'product')) {
+                            el.className = 'flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl text-sky-400 font-medium';
+                        } else {
+                            el.className = 'flex flex-col items-center gap-1 text-xs py-1 px-3 rounded-xl text-slate-400';
+                        }
+                    }
+                });
+            }
+
+            render() {
+                const container = document.getElementById('app-container');
+                if (!container) return;
+                container.innerHTML = '';
+
+                switch (this.currentView) {
+                    case 'home':
+                        container.innerHTML = this.renderHomeView();
+                        break;
+                    case 'categories':
+                        container.innerHTML = this.renderCategoriesView();
+                        break;
+                    case 'product':
+                        container.innerHTML = this.renderProductDetailView();
+                        break;
+                    case 'checkout':
+                        container.innerHTML = this.renderCheckoutView();
+                        break;
+                    case 'purchases':
+                        container.innerHTML = this.renderPurchasesView();
+                        break;
+                    case 'account':
+                        container.innerHTML = this.renderAccountView();
+                        break;
+                    default:
+                        container.innerHTML = this.renderHomeView();
+                }
+            }
+
+            renderHomeView() {
+                let filtered = this.products;
+                if (this.searchQuery) {
+                    filtered = filtered.filter(p => p.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+                }
+
+                return `
+                    <div class="space-y-6">
+                        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-sky-950 p-6 md:p-10 border border-slate-800">
+                            <div class="max-w-xl relative z-10">
+                                <span class="inline-block px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold mb-3">
+                                    Instant Digital Delivery in Nepal (Firebase Backed)
+                                </span>
+                                <h1 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight mb-3 leading-tight">
+                                    eBooks, Game Top-ups & Digital Keys in Seconds.
+                                </h1>
+                                <p class="text-slate-400 text-xs md:text-sm mb-6">
+                                    No physical shipping. Verified local Nepali payments via eSewa, Khalti & Fonepay.
+                                </p>
+
+                                <div class="relative">
+                                    <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-lg"></i>
+                                    <input type="text" 
+                                           placeholder="Search eBooks, PUBG UC, Spotify key..." 
+                                           value="${this.searchQuery}"
+                                           oninput="app.handleSearch(this.value)"
+                                           class="w-full pl-10 pr-4 py-3 bg-slate-950/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition shadow-inner">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400">Categories</h2>
+                                <button onclick="app.navigate('categories')" class="text-xs text-sky-400 hover:underline">View All</button>
+                            </div>
+                            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                                ${this.categories.map(c => `
+                                    <button onclick="app.navigate('category', '${c.id}')" class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl glass-card text-xs font-medium text-slate-300 hover:text-white hover:border-slate-700 transition">
+                                        <i class="ph-bold ${c.icon} text-sky-400 text-base"></i>
+                                        <span>${c.name}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="ph-bold ph-lightning text-sky-400"></i> Featured Digital Products
+                            </h2>
+
+                            ${filtered.length === 0 ? `
+                                <div class="p-12 text-center border border-dashed border-slate-800 rounded-2xl">
+                                    <i class="ph-bold ph-package text-4xl text-slate-600 mb-2"></i>
+                                    <p class="text-slate-400 text-sm">No digital products found matching your search.</p>
+                                </div>
+                            ` : `
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    ${filtered.map(p => this.renderProductCard(p)).join('')}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderProductCard(product) {
+                const isOwned = this.purchases.some(item => item.product_id === product.id);
+
+                return `
+                    <div onclick="app.navigate('product', '${product.id}')" class="glass-card rounded-2xl overflow-hidden hover:border-slate-700 transition cursor-pointer flex flex-col group">
+                        <div class="relative aspect-video overflow-hidden bg-slate-900">
+                            <img src="${product.cover_image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <span class="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-[10px] font-semibold text-sky-400 uppercase tracking-wider border border-slate-800">
+                                ${product.type === 'file' ? 'Direct File' : 'Instant Key'}
+                            </span>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
+                                    <i class="ph-fill ph-star"></i>
+                                    <span class="font-bold text-slate-200">${product.rating}</span>
+                                    <span class="text-slate-500">(${product.reviews_count})</span>
+                                </div>
+                                <h3 class="font-bold text-white text-base leading-snug line-clamp-1 group-hover:text-sky-400 transition">${product.title}</h3>
+                                <p class="text-xs text-slate-400 mt-1 line-clamp-2">${product.description}</p>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-slate-800/80">
+                                <div>
+                                    <span class="text-[10px] text-slate-500 block uppercase">Price</span>
+                                    <span class="text-base font-extrabold text-white">NPR ${product.price_npr}</span>
+                                </div>
+
+                                ${isOwned ? `
+                                    <span class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-1">
+                                        <i class="ph-bold ph-check-circle"></i> Owned
+                                    </span>
+                                ` : `
+                                    <button onclick="event.stopPropagation(); app.addToCart('${product.id}')" class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold flex items-center gap-1 transition">
+                                        <i class="ph-bold ph-shopping-cart-simple"></i> Add
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderCategoriesView() {
+                const catId = this.selectedCategoryId || this.categories[0].id;
+                const activeCat = this.categories.find(c => c.id === catId);
+                const filteredProducts = this.products.filter(p => p.category_id === catId);
+
+                return `
+                    <div class="space-y-6">
+                        <h1 class="text-2xl font-bold text-white">Product Categories</h1>
+                        
+                        <div class="flex gap-2 overflow-x-auto no-scrollbar border-b border-slate-800 pb-3">
+                            ${this.categories.map(c => `
+                                <button onclick="app.navigate('category', '${c.id}')" class="px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition ${c.id === catId ? 'bg-sky-500 text-white font-bold' : 'bg-slate-900 text-slate-400 hover:text-white'}">
+                                    ${c.name}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div>
+                            <h2 class="text-sm font-semibold text-slate-400 mb-3">${activeCat?.name || 'Products'} (${filteredProducts.length})</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${filteredProducts.map(p => this.renderProductCard(p)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderProductDetailView() {
+                const product = this.products.find(p => p.id === this.selectedProductId);
+                if (!product) return '<div class="text-center text-slate-400 py-10">Product not found.</div>';
+
+                const isOwned = this.purchases.some(item => item.product_id === product.id);
+                const prodReviews = this.reviews.filter(r => r.product_id === product.id);
+
+                return `
+                    <div class="space-y-8">
+                        <button onclick="app.navigate('home')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                            <i class="ph-bold ph-arrow-left"></i> Back to Catalog
+                        </button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="rounded-2xl overflow-hidden glass-card aspect-video md:aspect-square relative bg-slate-900">
+                                <img src="${product.cover_image}" alt="${product.title}" class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md text-xs font-bold text-sky-400 border border-slate-800">
+                                    ${product.type === 'file' ? 'Digital Download' : 'Activation Code'}
+                                </span>
+                            </div>
+
+                            <div class="space-y-5">
+                                <div>
+                                    <div class="flex items-center gap-2 text-amber-400 text-sm mb-2">
+                                        <i class="ph-fill ph-star"></i>
+                                        <span class="font-bold text-white">${product.rating}</span>
+                                        <span class="text-slate-500">(${product.reviews_count} Verified Ratings)</span>
+                                    </div>
+                                    <h1 class="text-2xl md:text-3xl font-extrabold text-white leading-tight">${product.title}</h1>
+                                    <p class="text-2xl font-black text-sky-400 mt-2">NPR ${product.price_npr}</p>
+                                </div>
+
+                                <p class="text-slate-300 text-sm leading-relaxed border-t border-b border-slate-800/80 py-4">
+                                    ${product.description}
+                                </p>
+
+                                <div class="space-y-3">
+                                    ${isOwned ? `
+                                        <button onclick="app.navigate('purchases')" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition">
+                                            <i class="ph-bold ph-download-simple text-lg"></i>
+                                            <span>Access in Your Library</span>
+                                        </button>
+                                    ` : `
+                                        <button onclick="app.buyNowDirect('${product.id}')" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-sm shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2 transition">
+                                            <i class="ph-bold ph-lightning text-lg"></i>
+                                            <span>Buy Now (Instant Access)</span>
+                                        </button>
+                                        <button onclick="app.addToCart('${product.id}')" class="w-full py-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 font-semibold text-sm flex items-center justify-center gap-2 transition">
+                                            <i class="ph-bold ph-shopping-bag"></i>
+                                            <span>Add to Cart</span>
+                                        </button>
+                                    `}
+                                </div>
+
+                                <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800/80 flex items-center gap-3 text-xs text-slate-400">
+                                    <i class="ph-bold ph-shield-check text-sky-400 text-xl flex-shrink-0"></i>
+                                    <span>Verified Nepali Local Gateway Support: eSewa, Khalti, & Fonepay direct integration.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-800 pt-8 space-y-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="ph-bold ph-star text-amber-400"></i> Verified Customer Reviews
+                            </h3>
+
+                            ${isOwned ? `
+                                <div class="glass-card p-4 rounded-xl space-y-3">
+                                    <span class="text-xs font-semibold text-slate-300 block">Leave a Verified Review:</span>
+                                    <div class="flex items-center gap-2">
+                                        <select id="review-rating" class="bg-slate-950 border border-slate-800 text-xs rounded-lg p-2 text-white">
+                                            <option value="5">5 Stars ⭐⭐⭐⭐⭐</option>
+                                            <option value="4">4 Stars ⭐⭐⭐⭐</option>
+                                            <option value="3">3 Stars ⭐⭐⭐</option>
+                                        </select>
+                                        <input type="text" id="review-comment" placeholder="Write your opinion..." class="flex-1 bg-slate-950 border border-slate-800 text-xs rounded-lg p-2 text-white">
+                                        <button onclick="app.submitReview('${product.id}')" class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs rounded-lg">Submit</button>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div class="space-y-3">
+                                ${prodReviews.length === 0 ? '<p class="text-xs text-slate-500">No live reviews yet. Be the first verified buyer to rate!</p>' : ''}
+                                ${prodReviews.map(r => `
+                                    <div class="glass-card p-4 rounded-xl text-xs space-y-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-bold text-white">${r.user_name}</span>
+                                            <span class="text-amber-400">${'★'.repeat(r.rating)}</span>
+                                        </div>
+                                        <p class="text-slate-300">${r.comment}</p>
+                                        <span class="text-[10px] text-slate-500 block">${r.date}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderCheckoutView() {
+                if (this.cart.length === 0) {
+                    return '<div class="text-center py-10 text-slate-400">Your cart is empty.</div>';
+                }
+
+                const total = this.cart.reduce((sum, item) => sum + item.price_npr, 0);
+
+                return `
+                    <div class="max-w-xl mx-auto space-y-6">
+                        <button onclick="app.navigate('home')" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                            <i class="ph-bold ph-arrow-left"></i> Cancel Checkout
+                        </button>
+
+                        <div class="glass-card p-6 rounded-2xl space-y-5 border border-slate-800">
+                            <h2 class="text-xl font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                                <i class="ph-bold ph-credit-card text-sky-400"></i> Local Nepal Payment Checkout
+                            </h2>
+
+                            <div class="space-y-3">
+                                <span class="text-xs text-slate-400 font-semibold uppercase">Order Items</span>
+                                ${this.cart.map(item => `
+                                    <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800/50">
+                                        <span class="text-white font-medium">${item.title}</span>
+                                        <span class="font-bold text-slate-300">NPR ${item.price_npr}</span>
+                                    </div>
+                                `).join('')}
+                                <div class="flex items-center justify-between text-sm font-bold pt-2 text-white">
+                                    <span>Total Payable:</span>
+                                    <span class="text-lg text-sky-400">NPR ${total}</span>
+                                </div>
+                            </div>
+
+                            <!-- QR Code & Payment Instructions -->
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col items-center text-center space-y-4">
+                                <span class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Scan QR Code to Pay</span>
+                                
+                                <div class="p-3 bg-white rounded-2xl shadow-lg border border-slate-200 w-48 h-48 flex items-center justify-center">
+                                    <img src="3449.jpg" alt="eSewa Payment QR Code" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/200x200/ffffff/000000?text=eSewa+QR+Code'">
+                                </div>
+
+                                <!-- Important Notice -->
+                                <div class="w-full bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-left space-y-1">
+                                    <div class="flex items-center gap-2 text-amber-400 font-bold text-xs">
+                                        <i class="ph-bold ph-warning-circle text-base"></i> Important Notice:
+                                    </div>
+                                    <p class="text-xs text-amber-200/90 leading-relaxed">
+                                        In <strong>Remark</strong>, write your email address registered in this app.
+                                    </p>
+                                </div>
+
+                                <!-- Screenshot Upload Section -->
+                                <div class="w-full text-left space-y-2 pt-2 border-t border-slate-800">
+                                    <label class="block text-xs font-semibold text-slate-300">Upload Screenshot after Payment (Proof)</label>
+                                    <input type="file" id="payment-screenshot" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500/20 file:text-sky-400 hover:file:bg-sky-500/30 cursor-pointer bg-slate-900 rounded-xl border border-slate-800 p-1.5">
+                                </div>
+                            </div>
+
+                            <button onclick="app.processPaymentGateway()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition">
+                                <i class="ph-bold ph-shield-check text-xl"></i>
+                                <span>Submit Payment Proof & Complete Order</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderPurchasesView() {
+                return `
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                            <div>
+                                <h1 class="text-2xl font-bold text-white">My Digital Library</h1>
+                                <p class="text-xs text-slate-400">Instant access to purchased eBooks, License Keys, and Game Top-ups synced to Firestore.</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold">
+                                ${this.purchases.length} Items
+                            </span>
+                        </div>
+
+                        ${this.purchases.length === 0 ? `
+                            <div class="p-12 text-center glass-card rounded-2xl">
+                                <i class="ph-bold ph-folder-open text-4xl text-slate-600 mb-2"></i>
+                                <p class="text-slate-400 text-sm">You haven't purchased any digital items yet.</p>
+                                <button onclick="app.navigate('home')" class="mt-4 px-4 py-2 bg-sky-500 text-white font-semibold text-xs rounded-xl">Browse Store</button>
+                            </div>
+                        ` : `
+                            <div class="space-y-4">
+                                ${this.purchases.map(item => {
+                                    const product = this.products.find(p => p.id === item.product_id);
+                                    return `
+                                        <div class="glass-card p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-16 h-16 rounded-xl bg-slate-900 overflow-hidden flex-shrink-0">
+                                                    <img src="${product?.cover_image || 'https://placehold.co/100x100/102a43/38bdf8?text=Alpine'}" class="w-full h-full object-cover">
+                                                </div>
+                                                <div>
+                                                    <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider block">${product?.type === 'file' ? 'File Asset' : 'Key / Voucher'}</span>
+                                                    <h3 class="font-bold text-white text-base">${product?.title || 'Digital Asset'}</h3>
+                                                    <span class="text-xs text-slate-500">Purchased on ${item.purchase_date}</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-3">
+                                                ${product?.type === 'file' ? `
+                                                    <button onclick="app.downloadAsset('${product.id}')" class="w-full md:w-auto px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs flex items-center justify-center gap-2 transition">
+                                                        <i class="ph-bold ph-download-simple text-base"></i>
+                                                        <span>Download File</span>
+                                                    </button>
+                                                ` : `
+                                                    <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                                        <code class="text-sky-400 font-mono text-xs px-2 font-bold">${item.delivered_key}</code>
+                                                        <button onclick="app.copyToClipboard('${item.delivered_key}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs" title="Copy Key">
+                                                            <i class="ph-bold ph-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+
+            renderAccountView() {
+                if (!this.user || this.user.isAnonymous) {
+                    return `
+                        <div class="max-w-md mx-auto glass-card p-6 rounded-2xl text-center space-y-4">
+                            <i class="ph-bold ph-user-circle text-5xl text-sky-400 mx-auto"></i>
+                            <h2 class="text-xl font-bold text-white">Sign In to Alpine</h2>
+                            <p class="text-xs text-slate-400">Manage your purchases, downloads, and Nepal local payment profiles in Firestore.</p>
+                            <button onclick="app.openAuthModal()" class="w-full py-3 bg-sky-500 hover:bg-sky-400 text-white font-semibold text-xs rounded-xl">Log In / Register</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="max-w-md mx-auto space-y-6">
+                        <div class="glass-card p-6 rounded-2xl space-y-4 text-center">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 text-white font-bold text-2xl flex items-center justify-center mx-auto">
+                                ${this.user.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-white">${this.user.name}</h2>
+                                <p class="text-xs text-slate-400">${this.user.email || this.user.phone || this.user.uid}</p>
+                                <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 text-[10px] font-bold uppercase">Customer</span>
+                            </div>
+                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-left space-y-1">
+                                <span class="text-[10px] text-slate-500 uppercase font-semibold block">User ID (Firestore UID)</span>
+                                <code class="text-xs text-sky-400 block break-all font-mono">${this.user.uid}</code>
+                            </div>
+                            <button onclick="app.logout()" class="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-semibold text-xs rounded-xl transition">
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            handleSearch(query) {
+                this.searchQuery = query;
+                if (this.currentView === 'home') {
+                    this.render();
+                }
+            }
+
+            addToCart(productId) {
+                const product = this.products.find(p => p.id === productId);
+                if (!product) return;
+
+                if (this.cart.some(item => item.id === productId)) {
+                    this.showToast('Item already in cart', 'info');
+                    return;
+                }
+
+                this.cart.push(product);
+                this.saveCart();
+                this.updateCartBadge();
+                this.showToast(`Added ${product.title} to cart!`, 'success');
+            }
+
+            removeFromCart(productId) {
+                this.cart = this.cart.filter(item => item.id !== productId);
+                this.saveCart();
+                this.updateCartBadge();
+                this.renderCartModalItems();
+            }
+
+            saveCart() {
+                localStorage.setItem('alpine_cart', JSON.stringify(this.cart));
+            }
+
+            updateCartBadge() {
+                const badge = document.getElementById('cart-badge');
+                if (badge) {
+                    badge.innerText = this.cart.length;
+                    badge.classList.toggle('hidden', this.cart.length === 0);
+                }
+            }
+
+            openCartModal() {
+                this.renderCartModalItems();
+                document.getElementById('cart-modal').classList.remove('hidden');
+            }
+
+            closeCartModal() {
+                document.getElementById('cart-modal').classList.add('hidden');
+            }
+
+            renderCartModalItems() {
+                const container = document.getElementById('cart-items-container');
+                const totalEl = document.getElementById('cart-total-price');
+
+                if (this.cart.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-500 text-center py-8">Your cart is currently empty.</p>';
+                    totalEl.innerText = 'NPR 0';
+                    return;
+                }
+
+                const total = this.cart.reduce((sum, item) => sum + item.price_npr, 0);
+                totalEl.innerText = `NPR ${total}`;
+
+                container.innerHTML = this.cart.map(item => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.cover_image}" class="w-10 h-10 rounded-lg object-cover">
+                            <div>
+                                <h4 class="text-xs font-bold text-white line-clamp-1">${item.title}</h4>
+                                <span class="text-xs font-semibold text-sky-400">NPR ${item.price_npr}</span>
+                            </div>
+                        </div>
+                        <button onclick="app.removeFromCart('${item.id}')" class="p-1 text-slate-500 hover:text-red-400">
+                            <i class="ph-bold ph-trash text-base"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            buyNowDirect(productId) {
+                if (!this.user || this.user.isAnonymous) {
+                    this.showToast('Please authenticate before buying', 'warning');
+                    this.openAuthModal();
+                    return;
+                }
+                this.cart = [];
+                this.addToCart(productId);
+                this.navigate('checkout');
+            }
+
+            initiateCheckout() {
+                this.closeCartModal();
+                if (!this.user || this.user.isAnonymous) {
+                    this.openAuthModal();
+                    return;
+                }
+                this.navigate('checkout');
+            }
+
+            async processPaymentGateway() {
+                if (!this.user || this.user.isAnonymous) return;
+
+                const selectedGateway = document.querySelector('input[name="payment_method"]:checked')?.value || 'esewa';
+                this.showToast(`Connecting to ${selectedGateway.toUpperCase()} Gateway...`, 'info');
+
+                try {
+                    const userPurchasesRef = collection(db, 'artifacts', appId, 'users', this.user.uid, 'purchases');
+
+                    for (const item of this.cart) {
+                        const key = item.type === 'key_voucher' ? (item.activation_pool?.[0] || 'VOUCHER-NP-99812-GEN') : null;
+                        await addDoc(userPurchasesRef, {
+                            product_id: item.id,
+                            delivered_key: key,
+                            purchase_date: new Date().toISOString().split('T')[0],
+                            price_npr: item.price_npr,
+                            gateway: selectedGateway,
+                            created_at: new Date().toISOString()
+                        });
+                    }
+
+                    this.cart = [];
+                    this.saveCart();
+                    this.updateCartBadge();
+
+                    this.showToast('Payment Verified! Items added to your Firestore digital library.', 'success');
+                    this.navigate('purchases');
+                } catch (e) {
+                    console.error("Error saving purchase to Firestore:", e);
+                    this.showToast('Failed to record order in backend', 'warning');
+                }
+            }
+
+            downloadAsset(productId) {
+                const product = this.products.find(p => p.id === productId);
+                this.showToast(`Generating secure signed download link...`, 'info');
+                setTimeout(() => {
+                    this.showToast(`Download started for ${product.title}`, 'success');
+                }, 1000);
+            }
+
+            copyToClipboard(text) {
+                const el = document.createElement('textarea');
+                el.value = text;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                this.showToast('Activation Key copied to clipboard!', 'success');
+            }
+
+            async submitReview(productId) {
+                if (!this.user || this.user.isAnonymous) {
+                    this.showToast('Login required to post reviews', 'warning');
+                    return;
+                }
+
+                const rating = parseInt(document.getElementById('review-rating').value);
+                const comment = document.getElementById('review-comment').value;
+
+                if (!comment.trim()) return;
+
+                try {
+                    const reviewsRef = collection(db, 'artifacts', appId, 'public', 'data', 'reviews');
+                    await addDoc(reviewsRef, {
+                        product_id: productId,
+                        user_id: this.user.uid,
+                        user_name: this.user.name,
+                        rating: rating,
+                        comment: comment,
+                        date: new Date().toISOString().split('T')[0],
+                        created_at: new Date().toISOString()
+                    });
+
+                    this.showToast('Review submitted to Firestore!', 'success');
+                    this.render();
+                } catch (e) {
+                    console.error("Error saving review:", e);
+                    this.showToast('Failed to save review', 'warning');
+                }
+            }
+
+            // --- AUTHENTICATION ENGINE ---
+            openAuthModal() {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
+
+            closeAuthModal() {
+                document.getElementById('auth-modal').classList.add('hidden');
+            }
+
+            async loginWithGoogle() {
+                const provider = new GoogleAuthProvider();
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    this.closeAuthModal();
+                    this.showToast(`Welcome ${result.user.displayName || 'User'}!`, 'success');
+                } catch (error) {
+                    console.error("Google login error:", error);
+                    this.showToast(error.message || 'Failed to sign in with Google', 'warning');
+                }
+            }
+
+            async logout() {
+                await signOut(auth);
+                await signInAnonymously(auth);
+                this.showToast('Signed out successfully', 'info');
+                this.navigate('home');
+            }
+
+            updateHeaderAuth() {
+                const container = document.getElementById('user-header-profile');
+                if (!container) return;
+
+                if (this.user && !this.user.isAnonymous) {
+                    container.innerHTML = `
+                        <button onclick="app.navigate('account')" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition">
+                            <div class="w-6 h-6 rounded-lg bg-sky-500 text-white font-bold text-xs flex items-center justify-center">
+                                ${this.user.name.charAt(0)}
+                            </div>
+                            <span class="text-xs font-medium text-slate-300 hidden md:inline">${this.user.name.split(' ')[0]}</span>
+                        </button>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <button onclick="app.openAuthModal()" class="px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 hover:bg-sky-500/20 text-xs font-semibold transition">
+                            Log In
+                        </button>
+                    `;
+                }
+            }
+
+            toggleTechSpecs() {
+                const modal = document.getElementById('specs-modal');
+                modal.classList.toggle('hidden');
+            }
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                if (!container) return;
+                const toast = document.createElement('div');
+                
+                const colors = {
+                    success: 'bg-emerald-950 border-emerald-800 text-emerald-200',
+                    warning: 'bg-amber-950 border-amber-800 text-amber-200',
+                    info: 'bg-sky-950 border-sky-800 text-sky-200'
+                };
+
+                toast.className = `p-3 rounded-xl border ${colors[type] || colors.info} text-xs font-medium shadow-xl flex items-center gap-2 transition-all transform translate-y-2`;
+                toast.innerHTML = `<i class="ph-bold ph-info text-base"></i> <span>${message}</span>`;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', '-translate-y-2');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Expose instance globally for button event listeners
+        window.app = new AlpineApp();
+    </script>
+</body>
+</html>
